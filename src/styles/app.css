@@ -1,0 +1,156 @@
+/* ─────────────────────────────────────────────────────────────
+   Agenda Salão — estilos do app (mesma identidade da landing)
+   ───────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  --ink:#181C1E; --teal:#0F8A78; --teal-d:#0B6E60; --teal-soft:#E4F1EE;
+  --paper:#F2F4F3; --stone:#5C6764; --amber:#C28A3C; --amber-soft:#F6ECDB;
+  --red:#C0493F; --red-soft:#F7E5E3;
+  --text:#1E2624; --line:rgba(24,28,30,.09);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--text);background:var(--paper)}
+h1,h2,h3,h4{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;line-height:1.1}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+
+.brand-mark{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;
+  background:var(--ink);color:#fff;font-family:'Bricolage Grotesque';font-size:19px;font-weight:700}
+.brand-mark.sm{width:30px;height:30px;font-size:16px;border-radius:8px}
+
+/* ── BOTÕES / FORM ─────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;
+  font-size:14px;padding:11px 18px;border-radius:10px;border:1px solid transparent;transition:.15s}
+.btn-primary{background:var(--teal);color:#fff;box-shadow:0 8px 20px -10px rgba(15,138,120,.6)}
+.btn-primary:hover{background:var(--teal-d)}
+.btn-ghost{background:#fff;border-color:var(--line);color:var(--text)}
+.btn-ghost:hover{border-color:var(--ink)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:13px;font-weight:600;color:var(--stone)}
+.input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:15px;
+  background:#fff;font-family:inherit;color:var(--text);transition:border-color .15s}
+.input:focus{outline:none;border-color:var(--teal)}
+
+/* ── AUTH (login) ──────────────────────────────────────────── */
+.auth{min-height:100vh;display:grid;place-items:center;padding:24px;
+  background:radial-gradient(120% 120% at 50% 0%, #fff 0%, var(--paper) 60%)}
+.auth-card{width:100%;max-width:400px;background:#fff;border:1px solid var(--line);
+  border-radius:20px;padding:38px 34px;box-shadow:0 30px 60px -30px rgba(24,28,30,.25)}
+.auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:26px}
+.auth-brand b{font-family:'Bricolage Grotesque';font-size:20px;font-weight:700}
+.auth-brand b span{color:var(--teal)}
+.auth-card h1{font-size:24px;margin-bottom:4px}
+.auth-card .sub{font-size:14px;color:var(--stone);margin-bottom:24px}
+.auth-err{background:var(--red-soft);color:var(--red);font-size:13px;font-weight:500;
+  padding:10px 14px;border-radius:9px;margin-bottom:14px}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--stone);font-size:12px}
+.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.demo-hint{text-align:center;font-size:12px;color:var(--stone);margin-top:14px}
+
+/* ── SHELL (app logado) ────────────────────────────────────── */
+.shell{display:flex;min-height:100vh}
+.side{width:240px;flex-shrink:0;background:var(--ink);color:#fff;display:flex;flex-direction:column;
+  padding:22px 16px;position:sticky;top:0;height:100vh}
+.side-brand{display:flex;align-items:center;gap:9px;padding:0 8px 22px;font-family:'Bricolage Grotesque';
+  font-size:18px;font-weight:700}
+.side-brand b{color:var(--teal)}
+.side-nav{display:flex;flex-direction:column;gap:4px;flex:1}
+.side-link{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;
+  font-size:14.5px;font-weight:500;color:rgba(255,255,255,.66);transition:.15s}
+.side-link:hover{background:rgba(255,255,255,.07);color:#fff}
+.side-link.active{background:var(--teal);color:#fff}
+.side-out{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;border:none;
+  background:transparent;color:rgba(255,255,255,.6);font-size:14.5px;font-weight:500;transition:.15s}
+.side-out:hover{background:rgba(255,255,255,.07);color:#fff}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{height:62px;display:flex;align-items:center;padding:0 30px;border-bottom:1px solid var(--line);
+  background:#fff;position:sticky;top:0;z-index:10}
+.topbar-neg{font-family:'Bricolage Grotesque';font-weight:600;font-size:16px}
+.content{padding:30px;max-width:1100px;width:100%}
+
+/* ── CABEÇALHO DE PÁGINA ───────────────────────────────────── */
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px}
+.page-head h1{font-size:27px}
+.page-head p{font-size:14px;color:var(--stone);margin-top:3px}
+
+/* ── KPIs ──────────────────────────────────────────────────── */
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:26px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}
+.kpi-label{font-size:13px;color:var(--stone);font-weight:500;display:flex;align-items:center;gap:7px}
+.kpi-label svg{color:var(--teal)}
+.kpi-value{font-family:'Bricolage Grotesque';font-size:30px;font-weight:700;margin-top:8px}
+
+/* ── CARD / LISTA ──────────────────────────────────────────── */
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:16px 20px;border-bottom:1px solid var(--line)}
+.card-head h3{font-size:16px}
+.tabs{display:flex;gap:6px}
+.tab{padding:7px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;
+  font-size:13px;font-weight:600;color:var(--stone)}
+.tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+.row{display:flex;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.row-time{font-family:'Bricolage Grotesque';font-weight:700;font-size:15px;color:var(--teal-d);min-width:50px}
+.row-main{flex:1;min-width:0}
+.row-title{font-weight:600;font-size:15px}
+.row-sub{font-size:13px;color:var(--stone);margin-top:2px}
+.row-val{font-weight:600;font-size:14px;white-space:nowrap}
+
+/* ── BADGES DE STATUS ──────────────────────────────────────── */
+.badge{font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.badge-confirmado{background:var(--teal-soft);color:var(--teal-d)}
+.badge-pendente{background:var(--amber-soft);color:var(--amber)}
+.badge-concluido{background:#E9ECEB;color:var(--stone)}
+.badge-cancelado{background:var(--red-soft);color:var(--red)}
+
+/* ── TABELA SIMPLES ────────────────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--stone);
+  font-weight:600;padding:13px 20px;border-bottom:1px solid var(--line)}
+.tbl td{padding:14px 20px;border-bottom:1px solid var(--line);font-size:14.5px}
+.tbl tr:last-child td{border-bottom:none}
+
+/* ── BARRA DE AÇÃO / BUSCA ─────────────────────────────────── */
+.toolbar{display:flex;gap:12px;margin-bottom:18px}
+.search{flex:1;display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:0 14px}
+.search input{flex:1;border:none;outline:none;padding:12px 0;font-size:15px;font-family:inherit;background:none}
+.search svg{color:var(--stone)}
+
+/* ── FORM INLINE (adicionar) ───────────────────────────────── */
+.inline-form{display:grid;gap:12px;padding:20px;background:#fff;border:1px solid var(--line);
+  border-radius:14px;margin-bottom:18px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));align-items:end}
+
+/* ── ESTADOS ───────────────────────────────────────────────── */
+.empty{text-align:center;padding:46px 20px;color:var(--stone);font-size:14px}
+.loading{padding:40px;text-align:center;color:var(--stone);font-size:14px}
+
+/* ── RESPONSIVO ────────────────────────────────────────────── */
+@media(max-width:780px){
+  .shell{flex-direction:column}
+  .side{width:100%;height:auto;position:static;flex-direction:row;align-items:center;padding:12px 14px;gap:10px}
+  .side-brand{padding:0;font-size:16px}
+  .side-nav{flex-direction:row;overflow-x:auto;gap:4px;flex:1;justify-content:flex-end}
+  .side-link span{display:none}
+  .side-out span{display:none}
+  .content{padding:20px}
+  .kpis{grid-template-columns:1fr}
+}
+
+/* ── MODAL ─────────────────────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(24,28,30,.45);display:grid;place-items:center;
+  z-index:100;padding:20px}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:440px;padding:26px;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.4)}
+.modal h3{font-size:20px;margin-bottom:18px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235C6764' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.auth-foot{text-align:center;font-size:13.5px;color:var(--stone);margin-top:18px}
+.auth-foot a{color:var(--teal-d);font-weight:600}
+.auth-ok{background:var(--teal-soft);color:var(--teal-d);font-size:14px;font-weight:500;
+  padding:14px;border-radius:10px;text-align:center}
