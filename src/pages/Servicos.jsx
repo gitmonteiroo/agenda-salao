@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Plus, X, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Plus, X, Trash2, ImagePlus } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
 const BRL = (v) =>
@@ -7,24 +7,37 @@ const BRL = (v) =>
 
 const VAZIO = { nome: "", duracao_min: "30", preco: "" };
 
+async function uploadFoto(file, servicoId) {
+  const ext = file.name.split(".").pop().toLowerCase();
+  const path = `${servicoId}.${ext}`;
+  await supabase.storage.from("servicos-fotos").upload(path, file, { upsert: true });
+  const { data: { publicUrl } } = supabase.storage.from("servicos-fotos").getPublicUrl(path);
+  return publicUrl;
+}
+
 export default function Servicos() {
   const [servicos, setServicos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [form, setForm] = useState(VAZIO);
+  const [imagemFile, setImagemFile] = useState(null);
+  const [imagemPreview, setImagemPreview] = useState(null);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
+  const inputFotoRef = useRef();
 
-  // modal de edição
   const [editando, setEditando] = useState(null);
   const [editForm, setEditForm] = useState(VAZIO);
+  const [editImagemFile, setEditImagemFile] = useState(null);
+  const [editImagemPreview, setEditImagemPreview] = useState(null);
   const [salvandoEdit, setSalvandoEdit] = useState(false);
   const [erroEdit, setErroEdit] = useState("");
+  const inputFotoEditRef = useRef();
 
   async function carregar() {
     setCarregando(true);
     const { data } = await supabase
       .from("servicos")
-      .select("id, nome, duracao_min, preco, ativo")
+      .select("id, nome, duracao_min, preco, ativo, imagem_url")
       .order("nome", { ascending: true });
     setServicos(data || []);
     setCarregando(false);
@@ -32,27 +45,49 @@ export default function Servicos() {
 
   useEffect(() => { carregar(); }, []);
 
+  function selecionarFoto(file, setFile, setPreview) {
+    if (!file) return;
+    setFile(file);
+    setPreview(URL.createObjectURL(file));
+  }
+
   async function adicionar(e) {
     e.preventDefault();
     if (!form.nome.trim()) return;
     setErro("");
     setSalvando(true);
-    const { data: neg, error: negErr } = await supabase
-      .from("negocios").select("id").limit(1).maybeSingle();
+
+    const { data: neg } = await supabase.from("negocios").select("id").limit(1).maybeSingle();
     if (!neg) {
-      setErro(negErr ? negErr.message : "Negócio não encontrado. Verifique seu cadastro.");
+      setErro("Negócio não encontrado. Verifique seu cadastro.");
       setSalvando(false);
       return;
     }
-    const { error } = await supabase.from("servicos").insert({
+
+    const { data: inserted, error } = await supabase.from("servicos").insert({
       negocio_id: neg.id,
       nome: form.nome.trim(),
       duracao_min: parseInt(form.duracao_min) || 30,
       preco: parseFloat(String(form.preco).replace(",", ".")) || 0,
-    });
-    if (error) { setErro("Erro ao salvar: " + error.message); }
-    else { setForm(VAZIO); carregar(); }
+    }).select("id").single();
+
+    if (error || !inserted) {
+      setErro("Erro ao salvar: " + (error?.message || "tente de novo."));
+      setSalvando(false);
+      return;
+    }
+
+    if (imagemFile) {
+      const url = await uploadFoto(imagemFile, inserted.id);
+      await supabase.from("servicos").update({ imagem_url: url }).eq("id", inserted.id);
+    }
+
+    setForm(VAZIO);
+    setImagemFile(null);
+    setImagemPreview(null);
+    if (inputFotoRef.current) inputFotoRef.current.value = "";
     setSalvando(false);
+    carregar();
   }
 
   function abrirEdicao(s) {
@@ -62,6 +97,8 @@ export default function Servicos() {
       duracao_min: String(s.duracao_min || 30),
       preco: String(s.preco || ""),
     });
+    setEditImagemFile(null);
+    setEditImagemPreview(s.imagem_url || null);
     setErroEdit("");
   }
 
@@ -70,11 +107,19 @@ export default function Servicos() {
     if (!editForm.nome.trim()) return;
     setErroEdit("");
     setSalvandoEdit(true);
+
+    let imagem_url = editando.imagem_url;
+    if (editImagemFile) {
+      imagem_url = await uploadFoto(editImagemFile, editando.id);
+    }
+
     const { error } = await supabase.from("servicos").update({
       nome: editForm.nome.trim(),
       duracao_min: parseInt(editForm.duracao_min) || 30,
       preco: parseFloat(String(editForm.preco).replace(",", ".")) || 0,
+      imagem_url,
     }).eq("id", editando.id);
+
     if (error) { setErroEdit("Erro ao salvar: " + error.message); }
     else { setEditando(null); carregar(); }
     setSalvandoEdit(false);
@@ -98,7 +143,8 @@ export default function Servicos() {
 
       {erro && <div className="auth-err" style={{ marginBottom: 14 }}>{erro}</div>}
 
-      <form className="inline-form" onSubmit={adicionar}>
+      <form className="inline-form" onSubmit={adicionar}
+        style={{ gridTemplateColumns: "1fr 1fr 1fr auto auto", alignItems: "end" }}>
         <div className="field" style={{ margin: 0 }}>
           <label>Serviço</label>
           <input className="input" value={form.nome}
@@ -116,7 +162,21 @@ export default function Servicos() {
             onChange={(e) => setForm({ ...form, preco: e.target.value })}
             placeholder="0,00" />
         </div>
-        <button className="btn btn-primary" disabled={salvando}>
+        <div className="field" style={{ margin: 0 }}>
+          <label>Foto</label>
+          <div className="img-upload-wrap">
+            {imagemPreview
+              ? <img src={imagemPreview} className="img-preview" alt="" />
+              : <div className="img-preview-ph">📷</div>}
+            <label className="img-upload-btn">
+              <ImagePlus size={14} style={{ marginRight: 4, verticalAlign: "-2px" }} />
+              {imagemFile ? "Trocar" : "Foto"}
+              <input ref={inputFotoRef} type="file" accept="image/*" style={{ display: "none" }}
+                onChange={(e) => selecionarFoto(e.target.files[0], setImagemFile, setImagemPreview)} />
+            </label>
+          </div>
+        </div>
+        <button className="btn btn-primary" disabled={salvando} style={{ marginBottom: 0 }}>
           <Plus size={16} /> {salvando ? "Salvando…" : "Adicionar"}
         </button>
       </form>
@@ -129,7 +189,7 @@ export default function Servicos() {
         ) : (
           <table className="tbl">
             <thead>
-              <tr><th>Serviço</th><th>Duração</th><th>Preço</th></tr>
+              <tr><th></th><th>Serviço</th><th>Duração</th><th>Preço</th></tr>
             </thead>
             <tbody>
               {servicos.map((s) => (
@@ -137,6 +197,11 @@ export default function Servicos() {
                   style={{ cursor: "pointer" }}
                   onMouseEnter={e => e.currentTarget.style.background = "#F2F4F3"}
                   onMouseLeave={e => e.currentTarget.style.background = ""}>
+                  <td style={{ width: 56, paddingRight: 0 }}>
+                    {s.imagem_url
+                      ? <img src={s.imagem_url} className="srv-thumb" alt={s.nome} />
+                      : <div className="srv-thumb-ph">📷</div>}
+                  </td>
                   <td style={{ fontWeight: 600 }}>{s.nome}</td>
                   <td>{s.duracao_min} min</td>
                   <td>{BRL(s.preco)}</td>
@@ -161,6 +226,20 @@ export default function Servicos() {
 
             <form onSubmit={salvarEdicao}>
               <div className="field">
+                <label>Foto do serviço</label>
+                <div className="img-upload-wrap">
+                  {editImagemPreview
+                    ? <img src={editImagemPreview} className="img-preview" alt="" />
+                    : <div className="img-preview-ph">📷</div>}
+                  <label className="img-upload-btn">
+                    <ImagePlus size={14} style={{ marginRight: 4, verticalAlign: "-2px" }} />
+                    {editImagemFile ? "Trocar foto" : "Escolher foto"}
+                    <input ref={inputFotoEditRef} type="file" accept="image/*" style={{ display: "none" }}
+                      onChange={(e) => selecionarFoto(e.target.files[0], setEditImagemFile, setEditImagemPreview)} />
+                  </label>
+                </div>
+              </div>
+              <div className="field">
                 <label>Nome do serviço</label>
                 <input className="input" value={editForm.nome}
                   onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })}
@@ -178,8 +257,7 @@ export default function Servicos() {
                   placeholder="0,00" />
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn btn-ghost" style={{ color: "var(--red)" }}
-                  onClick={excluir}>
+                <button type="button" className="btn btn-ghost" style={{ color: "var(--red)" }} onClick={excluir}>
                   <Trash2 size={15} /> Excluir
                 </button>
                 <button type="button" className="btn btn-ghost" onClick={() => setEditando(null)}>

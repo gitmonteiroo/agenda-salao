@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { CalendarCheck, Clock, Check } from "lucide-react";
+import { Clock, Check } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
 const BRL = (v) =>
@@ -13,7 +13,7 @@ const ymd = (d) => {
 
 const HORA_INICIO = 9;
 const HORA_FIM = 18;
-const PASSO = 30; // minutos
+const PASSO = 30;
 
 function gerarSlots(dataStr, durMin, ocupados) {
   const slots = [];
@@ -36,7 +36,7 @@ function gerarSlots(dataStr, durMin, ocupados) {
 
 export default function AgendarPublico() {
   const { slug } = useParams();
-  const [info, setInfo] = useState(undefined); // undefined=carregando, null=não encontrado
+  const [info, setInfo] = useState(undefined);
   const [servicoId, setServicoId] = useState("");
   const [data, setData] = useState(ymd(new Date()));
   const [ocupados, setOcupados] = useState([]);
@@ -59,7 +59,6 @@ export default function AgendarPublico() {
     [info, servicoId]
   );
 
-  // recarrega horários ocupados quando muda serviço/data
   useEffect(() => {
     setHora("");
     if (!servicoId) return;
@@ -77,7 +76,6 @@ export default function AgendarPublico() {
     setErro("");
     if (!servicoId || !hora) { setErro("Escolha o serviço e o horário."); return; }
     if (!nome.trim()) { setErro("Informe seu nome."); return; }
-
     const inicio = new Date(`${data}T${hora}:00`).toISOString();
     setEnviando(true);
     const { data: res } = await supabase.rpc("agendamento_publico_criar", {
@@ -88,7 +86,6 @@ export default function AgendarPublico() {
       p_cliente_telefone: telefone.trim(),
     });
     setEnviando(false);
-
     if (res?.ok) setSucesso(true);
     else setErro(res?.erro || "Não foi possível agendar. Tente outro horário.");
   }
@@ -116,10 +113,12 @@ export default function AgendarPublico() {
           </div>
           <h1>Agendamento enviado!</h1>
           <p className="sub">
-            {info.negocio.nome} recebeu seu pedido para {new Date(`${data}T${hora}`).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}.
+            {info.negocio.nome} recebeu seu pedido para{" "}
+            {new Date(`${data}T${hora}`).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}.
             Você receberá a confirmação em breve.
           </p>
-          <button className="btn btn-ghost" style={{ width: "100%" }} onClick={() => { setSucesso(false); setHora(""); }}>
+          <button className="btn btn-ghost" style={{ width: "100%", marginTop: 16 }}
+            onClick={() => { setSucesso(false); setHora(""); setServicoId(""); }}>
             Fazer outro agendamento
           </button>
         </div>
@@ -129,36 +128,57 @@ export default function AgendarPublico() {
 
   return (
     <div className="auth" style={{ alignItems: "flex-start", paddingTop: 40 }}>
-      <div className="auth-card" style={{ maxWidth: 460 }}>
-        <div className="auth-brand" style={{ marginBottom: 8 }}>
+      <div className="auth-card" style={{ maxWidth: 500 }}>
+        <div className="auth-brand" style={{ marginBottom: 4 }}>
           <span className="brand-mark">A</span>
           <b>{info.negocio.nome}</b>
         </div>
-        <p className="sub" style={{ marginBottom: 22 }}>Agende seu horário online.</p>
+        <p className="sub" style={{ marginBottom: 24 }}>Agende seu horário online.</p>
 
-        {erro && <div className="auth-err">{erro}</div>}
+        {erro && <div className="auth-err" style={{ marginBottom: 16 }}>{erro}</div>}
 
+        {/* SELEÇÃO DE SERVIÇO — cards visuais */}
         <div className="field">
-          <label><CalendarCheck size={14} style={{ verticalAlign: "-2px", marginRight: 4 }} /> Serviço</label>
-          <select className="input" value={servicoId} onChange={(e) => setServicoId(e.target.value)}>
-            <option value="">Selecione o serviço…</option>
+          <label style={{ fontSize: 13, fontWeight: 600, color: "var(--stone)" }}>
+            Escolha o serviço
+          </label>
+          <div className="srv-grid">
             {info.servicos.map((s) => (
-              <option key={s.id} value={s.id}>{s.nome} — {BRL(s.preco)} · {s.duracao_min}min</option>
+              <button key={s.id} type="button"
+                className={"srv-card" + (servicoId === s.id ? " sel" : "")}
+                onClick={() => { setServicoId(s.id); setHora(""); }}>
+                {s.imagem_url
+                  ? <img src={s.imagem_url} className="srv-card-img" alt={s.nome} />
+                  : <div className="srv-card-ph">💅</div>}
+                <div className="srv-card-body">
+                  <div className="srv-card-nome">{s.nome}</div>
+                  <div className="srv-card-info">
+                    {BRL(s.preco)} · {s.duracao_min} min
+                  </div>
+                </div>
+              </button>
             ))}
-          </select>
-        </div>
-
-        <div className="field">
-          <label>Data</label>
-          <input className="input" type="date" value={data} min={ymd(new Date())}
-            onChange={(e) => setData(e.target.value)} />
+          </div>
         </div>
 
         {servicoId && (
+          <div className="field" style={{ marginTop: 18 }}>
+            <label>Data</label>
+            <input className="input" type="date" value={data} min={ymd(new Date())}
+              onChange={(e) => { setData(e.target.value); setHora(""); }} />
+          </div>
+        )}
+
+        {servicoId && (
           <div className="field">
-            <label><Clock size={14} style={{ verticalAlign: "-2px", marginRight: 4 }} /> Horário</label>
+            <label>
+              <Clock size={14} style={{ verticalAlign: "-2px", marginRight: 4 }} />
+              Horário disponível
+            </label>
             {slots.length === 0 ? (
-              <p style={{ fontSize: 14, color: "var(--stone)" }}>Sem horários livres neste dia. Tente outra data.</p>
+              <p style={{ fontSize: 14, color: "var(--stone)" }}>
+                Sem horários livres neste dia. Tente outra data.
+              </p>
             ) : (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {slots.map((h) => (
@@ -171,18 +191,27 @@ export default function AgendarPublico() {
           </div>
         )}
 
-        <div className="field">
-          <label>Seu nome</label>
-          <input className="input" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Nome completo" />
-        </div>
-        <div className="field">
-          <label>WhatsApp</label>
-          <input className="input" value={telefone} onChange={(e) => setTelefone(e.target.value)} placeholder="(00) 00000-0000" />
-        </div>
+        {hora && (
+          <>
+            <div className="field" style={{ marginTop: 18 }}>
+              <label>Seu nome</label>
+              <input className="input" value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Nome completo" />
+            </div>
+            <div className="field">
+              <label>WhatsApp</label>
+              <input className="input" value={telefone}
+                onChange={(e) => setTelefone(e.target.value)}
+                placeholder="(00) 00000-0000" />
+            </div>
 
-        <button className="btn btn-primary" style={{ width: "100%" }} onClick={confirmar} disabled={enviando}>
-          {enviando ? "Enviando…" : "Confirmar agendamento"}
-        </button>
+            <button className="btn btn-primary" style={{ width: "100%", marginTop: 4 }}
+              onClick={confirmar} disabled={enviando}>
+              {enviando ? "Enviando…" : "Confirmar agendamento"}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
