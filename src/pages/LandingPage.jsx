@@ -16,7 +16,7 @@ const LOGIN_URL = "/login";
 const DEMO_URL = "/login";
 const CADASTRO_URL = "/cadastro";
 const WPP_MSG = encodeURIComponent(
-  "Olá! Vi o Agenda Salão e quero testar 14 dias grátis."
+  "Olá! Vi o Agenda Salão e quero testar 7 dias grátis."
 );
 const wppLink = `https://wa.me/${WHATSAPP}?text=${WPP_MSG}`;
 
@@ -71,7 +71,7 @@ const PLANOS = [
 const FAQ = [
   { q: "Preciso instalar algum programa?", a: "Não. O Agenda Salão funciona direto pelo navegador do celular ou do computador. É só entrar e usar." },
   { q: "Meus clientes precisam baixar um aplicativo?", a: "Não. Eles agendam por um link — abre no navegador, escolhem o horário e pronto." },
-  { q: "Consigo testar antes de pagar?", a: "Sim. São 14 dias grátis, sem precisar cadastrar cartão. Se gostar, é só assinar." },
+  { q: "Consigo testar antes de pagar?", a: "Sim. São 7 dias grátis, sem precisar cadastrar cartão. Se gostar, é só assinar." },
   { q: "Meus dados e os dos meus clientes ficam seguros?", a: "Sim. Cada conta tem seus dados isolados e protegidos. Ninguém vê a sua agenda além de você." },
   { q: "E se eu precisar de ajuda?", a: "Você fala direto com a gente pelo WhatsApp. Ajudamos a configurar tudo no começo." },
 ];
@@ -228,7 +228,7 @@ export default function LandingPage() {
             </a>
             <a href={DEMO_URL} className="btn-line">Ver demonstração</a>
           </div>
-          <p className="hero-note">14 dias grátis · sem cartão · cancela quando quiser</p>
+          <p className="hero-note">7 dias grátis · sem cartão · cancela quando quiser</p>
         </div>
         <div className="hero-visual">
           <AgendaViva />
@@ -339,7 +339,7 @@ export default function LandingPage() {
             </Reveal>
           ))}
         </div>
-        <p className="planos-note">Todos os planos com 14 dias grátis. Sem fidelidade.</p>
+        <p className="planos-note">Todos os planos com 7 dias grátis. Sem fidelidade.</p>
       </section>
 
       {/* FAQ */}
@@ -359,7 +359,7 @@ export default function LandingPage() {
           <a href={wppLink} className="btn-primary big" target="_blank" rel="noreferrer">
             Começar teste grátis <ArrowRight size={20} />
           </a>
-          <p className="hero-note light">14 dias grátis · sem cartão</p>
+          <p className="hero-note light">7 dias grátis · sem cartão</p>
         </Reveal>
       </section>
 
