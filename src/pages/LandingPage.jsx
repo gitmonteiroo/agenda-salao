@@ -11,9 +11,10 @@ import {
 //   LOGIN_URL → rota da tela de login (padrão "/login")
 //   DEMO_URL  → rota que faz login automático na conta demo
 // ─────────────────────────────────────────────────────────────
-const WHATSAPP = "5575900000000";
+const WHATSAPP = "5575992520543";
 const LOGIN_URL = "/login";
 const DEMO_URL = "/login";
+const CADASTRO_URL = "/cadastro";
 const WPP_MSG = encodeURIComponent(
   "Olá! Vi o Agenda Salão e quero testar 14 dias grátis."
 );
@@ -204,7 +205,7 @@ export default function LandingPage() {
         </nav>
         <div className="nav-cta">
           <a href={LOGIN_URL} className="btn-ghost">Entrar</a>
-          <a href={wppLink} className="btn-primary btn-sm" target="_blank" rel="noreferrer">Teste grátis</a>
+          <a href={CADASTRO_URL} className="btn-primary btn-sm">Teste grátis</a>
         </div>
       </header>
 
@@ -222,7 +223,7 @@ export default function LandingPage() {
             automaticamente e mostra quanto você fatura — tudo num lugar só.
           </p>
           <div className="hero-btns">
-            <a href={wppLink} className="btn-primary" target="_blank" rel="noreferrer">
+            <a href={CADASTRO_URL} className="btn-primary">
               Começar teste grátis <ArrowRight size={18} />
             </a>
             <a href={DEMO_URL} className="btn-line">Ver demonstração</a>
@@ -330,7 +331,7 @@ export default function LandingPage() {
                     <li key={it}><Check size={16} /> {it}</li>
                   ))}
                 </ul>
-                <a href={wppLink} target="_blank" rel="noreferrer"
+                <a href={CADASTRO_URL}
                    className={p.destaque ? "btn-primary full" : "btn-line full"}>
                   Começar teste grátis
                 </a>
@@ -355,7 +356,7 @@ export default function LandingPage() {
       <section className="cta-final">
         <Reveal>
           <h2>Seu próximo cliente já quer marcar.<br />Deixe a agenda trabalhar por você.</h2>
-          <a href={wppLink} className="btn-primary big" target="_blank" rel="noreferrer">
+          <a href={CADASTRO_URL} className="btn-primary big">
             Começar teste grátis <ArrowRight size={20} />
           </a>
           <p className="hero-note light">14 dias grátis · sem cartão</p>
