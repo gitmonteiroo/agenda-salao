@@ -205,7 +205,7 @@ export default function LandingPage() {
         </nav>
         <div className="nav-cta">
           <a href={LOGIN_URL} className="btn-ghost">Entrar</a>
-          <a href={CADASTRO_URL} className="btn-primary btn-sm">Teste grátis</a>
+          <a href={wppLink} className="btn-primary btn-sm" target="_blank" rel="noreferrer">Teste grátis</a>
         </div>
       </header>
 
@@ -223,7 +223,7 @@ export default function LandingPage() {
             automaticamente e mostra quanto você fatura — tudo num lugar só.
           </p>
           <div className="hero-btns">
-            <a href={CADASTRO_URL} className="btn-primary">
+            <a href={wppLink} className="btn-primary" target="_blank" rel="noreferrer">
               Começar teste grátis <ArrowRight size={18} />
             </a>
             <a href={DEMO_URL} className="btn-line">Ver demonstração</a>
@@ -331,7 +331,7 @@ export default function LandingPage() {
                     <li key={it}><Check size={16} /> {it}</li>
                   ))}
                 </ul>
-                <a href={CADASTRO_URL}
+                <a href={wppLink} target="_blank" rel="noreferrer"
                    className={p.destaque ? "btn-primary full" : "btn-line full"}>
                   Começar teste grátis
                 </a>
@@ -356,7 +356,7 @@ export default function LandingPage() {
       <section className="cta-final">
         <Reveal>
           <h2>Seu próximo cliente já quer marcar.<br />Deixe a agenda trabalhar por você.</h2>
-          <a href={CADASTRO_URL} className="btn-primary big">
+          <a href={wppLink} className="btn-primary big" target="_blank" rel="noreferrer">
             Começar teste grátis <ArrowRight size={20} />
           </a>
           <p className="hero-note light">14 dias grátis · sem cartão</p>
