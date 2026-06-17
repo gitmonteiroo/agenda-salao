@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, Wallet, Users, Check, Plus, X } from "lucide-react";
+import { CalendarDays, Wallet, Users, Check, Plus, X, Trash2 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
 const BRL = (v) =>
@@ -25,7 +25,8 @@ export default function Agenda() {
   const [totalClientes, setTotalClientes] = useState(0);
   const [carregando, setCarregando] = useState(true);
   const [aba, setAba] = useState("hoje");
-  const [modal, setModal] = useState(false);
+  const [modalNovo, setModalNovo] = useState(false);
+  const [agEditar, setAgEditar] = useState(null); // agendamento selecionado para editar
 
   async function carregar() {
     setCarregando(true);
@@ -34,7 +35,7 @@ export default function Agenda() {
 
     const { data } = await supabase
       .from("agendamentos")
-      .select("id, inicio, fim, status, valor, clientes(nome), servicos(nome)")
+      .select("id, inicio, fim, status, valor, cliente_id, servico_id, clientes(nome), servicos(nome)")
       .order("inicio", { ascending: true });
     setAgs(data || []);
 
@@ -70,7 +71,8 @@ export default function Agenda() {
   const diaSelecionado = aba === "hoje" ? hojeStr : amanhaStr;
   const lista = ags.filter((a) => ymd(a.inicio) === diaSelecionado);
 
-  async function concluir(id) {
+  async function concluir(e, id) {
+    e.stopPropagation();
     await supabase.from("agendamentos").update({ status: "concluido" }).eq("id", id);
     carregar();
   }
@@ -82,7 +84,7 @@ export default function Agenda() {
           <h1>Agenda</h1>
           <p>Seus horários e o resumo do dia.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setModal(true)}>
+        <button className="btn btn-primary" onClick={() => setModalNovo(true)}>
           <Plus size={16} /> Novo agendamento
         </button>
       </div>
@@ -117,7 +119,11 @@ export default function Agenda() {
           <div className="empty">Nenhum horário marcado para este dia.</div>
         ) : (
           lista.map((a) => (
-            <div className="row" key={a.id}>
+            <div className="row" key={a.id}
+              onClick={() => setAgEditar(a)}
+              style={{ cursor: "pointer" }}
+              onMouseEnter={e => e.currentTarget.style.background = "#F2F4F3"}
+              onMouseLeave={e => e.currentTarget.style.background = ""}>
               <span className="row-time">{horaDe(a.inicio)}</span>
               <div className="row-main">
                 <div className="row-title">{a.servicos?.nome || "Serviço"}</div>
@@ -126,7 +132,8 @@ export default function Agenda() {
               <span className="row-val">{BRL(a.valor)}</span>
               <span className={`badge badge-${a.status}`}>{STATUS_LABEL[a.status] || a.status}</span>
               {a.status !== "concluido" && a.status !== "cancelado" && (
-                <button className="btn btn-ghost" style={{ padding: "8px 12px" }} onClick={() => concluir(a.id)}>
+                <button className="btn btn-ghost" style={{ padding: "8px 12px" }}
+                  onClick={(e) => concluir(e, a.id)}>
                   <Check size={15} /> Concluir
                 </button>
               )}
@@ -135,13 +142,23 @@ export default function Agenda() {
         )}
       </div>
 
-      {modal && (
+      {modalNovo && (
         <ModalNovo
           clientes={clientes}
           servicos={servicos}
           negocioId={negocioId}
-          onClose={() => setModal(false)}
-          onSalvo={() => { setModal(false); carregar(); }}
+          onClose={() => setModalNovo(false)}
+          onSalvo={() => { setModalNovo(false); carregar(); }}
+        />
+      )}
+
+      {agEditar && (
+        <ModalEditar
+          ag={agEditar}
+          clientes={clientes}
+          servicos={servicos}
+          onClose={() => setAgEditar(null)}
+          onSalvo={() => { setAgEditar(null); carregar(); }}
         />
       )}
     </>
@@ -159,14 +176,10 @@ function ModalNovo({ clientes, servicos, negocioId, onClose, onSalvo }) {
   async function salvar(e) {
     e.preventDefault();
     setErro("");
-    if (!clienteId || !servicoId) {
-      setErro("Escolha o cliente e o serviço.");
-      return;
-    }
+    if (!clienteId || !servicoId) { setErro("Escolha o cliente e o serviço."); return; }
     const servico = servicos.find((s) => s.id === servicoId);
     const inicio = new Date(`${data}T${hora}:00`);
     const fim = new Date(inicio.getTime() + (servico?.duracao_min || 30) * 60000);
-
     setSalvando(true);
     const { error } = await supabase.from("agendamentos").insert({
       negocio_id: negocioId,
@@ -185,13 +198,11 @@ function ModalNovo({ clientes, servicos, negocioId, onClose, onSalvo }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
           <h3>Novo agendamento</h3>
           <button className="btn btn-ghost" style={{ padding: 8 }} onClick={onClose}><X size={16} /></button>
         </div>
-
-        {erro && <div className="auth-err">{erro}</div>}
-
+        {erro && <div className="auth-err" style={{ marginBottom: 14 }}>{erro}</div>}
         <form onSubmit={salvar}>
           <div className="field">
             <label>Cliente</label>
@@ -223,6 +234,114 @@ function ModalNovo({ clientes, servicos, negocioId, onClose, onSalvo }) {
             <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
             <button type="submit" className="btn btn-primary" disabled={salvando}>
               {salvando ? "Salvando…" : "Agendar"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function ModalEditar({ ag, clientes, servicos, onClose, onSalvo }) {
+  const inicioDate = new Date(ag.inicio);
+  const [clienteId, setClienteId] = useState(ag.cliente_id || "");
+  const [servicoId, setServicoId] = useState(ag.servico_id || "");
+  const [data, setData] = useState(ymd(inicioDate));
+  const [hora, setHora] = useState(
+    `${String(inicioDate.getHours()).padStart(2, "0")}:${String(inicioDate.getMinutes()).padStart(2, "0")}`
+  );
+  const [status, setStatus] = useState(ag.status || "confirmado");
+  const [valor, setValor] = useState(String(ag.valor || ""));
+  const [salvando, setSalvando] = useState(false);
+  const [erro, setErro] = useState("");
+
+  async function salvar(e) {
+    e.preventDefault();
+    setErro("");
+    if (!clienteId || !servicoId) { setErro("Escolha o cliente e o serviço."); return; }
+    const servico = servicos.find((s) => s.id === servicoId);
+    const inicio = new Date(`${data}T${hora}:00`);
+    const fim = new Date(inicio.getTime() + (servico?.duracao_min || 30) * 60000);
+    setSalvando(true);
+    const { error } = await supabase.from("agendamentos").update({
+      cliente_id: clienteId,
+      servico_id: servicoId,
+      inicio: inicio.toISOString(),
+      fim: fim.toISOString(),
+      status,
+      valor: parseFloat(String(valor).replace(",", ".")) || 0,
+    }).eq("id", ag.id);
+    setSalvando(false);
+    if (error) { setErro("Erro ao salvar: " + error.message); return; }
+    onSalvo();
+  }
+
+  async function excluir() {
+    if (!window.confirm("Excluir este agendamento?")) return;
+    await supabase.from("agendamentos").delete().eq("id", ag.id);
+    onSalvo();
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+          <h3>Editar agendamento</h3>
+          <button className="btn btn-ghost" style={{ padding: 8 }} onClick={onClose}><X size={16} /></button>
+        </div>
+        {erro && <div className="auth-err" style={{ marginBottom: 14 }}>{erro}</div>}
+        <form onSubmit={salvar}>
+          <div className="field">
+            <label>Cliente</label>
+            <select className="input" value={clienteId} onChange={(e) => setClienteId(e.target.value)}>
+              <option value="">Selecione…</option>
+              {clientes.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
+            </select>
+          </div>
+          <div className="field">
+            <label>Serviço</label>
+            <select className="input" value={servicoId} onChange={(e) => setServicoId(e.target.value)}>
+              <option value="">Selecione…</option>
+              {servicos.map((s) => (
+                <option key={s.id} value={s.id}>{s.nome} — {BRL(s.preco)}</option>
+              ))}
+            </select>
+          </div>
+          <div style={{ display: "flex", gap: 12 }}>
+            <div className="field" style={{ flex: 1 }}>
+              <label>Data</label>
+              <input className="input" type="date" value={data} onChange={(e) => setData(e.target.value)} />
+            </div>
+            <div className="field" style={{ flex: 1 }}>
+              <label>Hora</label>
+              <input className="input" type="time" value={hora} onChange={(e) => setHora(e.target.value)} />
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 12 }}>
+            <div className="field" style={{ flex: 1 }}>
+              <label>Status</label>
+              <select className="input" value={status} onChange={(e) => setStatus(e.target.value)}>
+                <option value="confirmado">Confirmado</option>
+                <option value="pendente">Pendente</option>
+                <option value="concluido">Concluído</option>
+                <option value="cancelado">Cancelado</option>
+              </select>
+            </div>
+            <div className="field" style={{ flex: 1 }}>
+              <label>Valor (R$)</label>
+              <input className="input" value={valor}
+                onChange={(e) => setValor(e.target.value)}
+                placeholder="0,00" />
+            </div>
+          </div>
+          <div className="modal-actions">
+            <button type="button" className="btn btn-ghost" style={{ color: "var(--red)", marginRight: "auto" }}
+              onClick={excluir}>
+              <Trash2 size={15} /> Excluir
+            </button>
+            <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={salvando}>
+              {salvando ? "Salvando…" : "Salvar"}
             </button>
           </div>
         </form>
