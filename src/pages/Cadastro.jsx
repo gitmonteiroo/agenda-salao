@@ -42,7 +42,7 @@ export default function Cadastro() {
       <div className="auth-card">
         <Link to="/" className="auth-brand">
           <span className="brand-mark">A</span>
-          <b>Agenda<span>Salão</span></b>
+          <b>Agend<span>i</span></b>
         </Link>
 
         {aguardandoEmail ? (
@@ -55,7 +55,7 @@ export default function Cadastro() {
         ) : (
           <>
             <h1>Criar conta</h1>
-            <p className="sub">Comece seu teste grátis de 14 dias.</p>
+            <p className="sub">Comece seu teste grátis de 7 dias.</p>
 
             {erro && <div className="auth-err">{erro}</div>}
 

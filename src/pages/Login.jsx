@@ -45,7 +45,7 @@ export default function Login() {
       <div className="auth-card">
         <Link to="/" className="auth-brand">
           <span className="brand-mark">A</span>
-          <b>Agenda<span>Salão</span></b>
+          <b>Agend<span>i</span></b>
         </Link>
 
         <h1>Entrar na conta</h1>

@@ -34,7 +34,7 @@ export default function AppLayout() {
       <aside className="side">
         <div className="side-brand">
           <span className="brand-mark sm">A</span>
-          <span>Agenda<b>Salão</b></span>
+          <span>Agend<b>i</b></span>
         </div>
         <nav className="side-nav">
           {NAV.map((n) => (

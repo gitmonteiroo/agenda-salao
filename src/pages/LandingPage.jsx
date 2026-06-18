@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────
-// Agenda Salão — Landing page
+// Agendi — Landing page
 // Ajuste antes do deploy:
 //   WHATSAPP  → seu número com DDI (ex.: 5575999999999)
 //   LOGIN_URL → rota da tela de login (padrão "/login")
@@ -16,7 +16,7 @@ const LOGIN_URL = "/login";
 const DEMO_URL = "/login";
 const CADASTRO_URL = "/cadastro";
 const WPP_MSG = encodeURIComponent(
-  "Olá! Vi o Agenda Salão e quero testar 7 dias grátis."
+  "Olá! Vi o Agendi e quero testar 7 dias grátis."
 );
 const wppLink = `https://wa.me/${WHATSAPP}?text=${WPP_MSG}`;
 
@@ -69,7 +69,7 @@ const PLANOS = [
 ];
 
 const FAQ = [
-  { q: "Preciso instalar algum programa?", a: "Não. O Agenda Salão funciona direto pelo navegador do celular ou do computador. É só entrar e usar." },
+  { q: "Preciso instalar algum programa?", a: "Não. O Agendi funciona direto pelo navegador do celular ou do computador. É só entrar e usar." },
   { q: "Meus clientes precisam baixar um aplicativo?", a: "Não. Eles agendam por um link — abre no navegador, escolhem o horário e pronto." },
   { q: "Consigo testar antes de pagar?", a: "Sim. São 7 dias grátis, sem precisar cadastrar cartão. Se gostar, é só assinar." },
   { q: "Meus dados e os dos meus clientes ficam seguros?", a: "Sim. Cada conta tem seus dados isolados e protegidos. Ninguém vê a sua agenda além de você." },
@@ -196,7 +196,7 @@ export default function LandingPage() {
       <header className="nav">
         <a href="#topo" className="brand">
           <span className="brand-mark">A</span>
-          <span className="brand-name">Agenda<span>Salão</span></span>
+          <span className="brand-name">Agend<span>i</span></span>
         </a>
         <nav className="nav-links">
           <a href="#recursos">Recursos</a>
@@ -219,7 +219,7 @@ export default function LandingPage() {
             sem bagunça no WhatsApp.
           </h1>
           <p className="hero-sub">
-            O Agenda Salão organiza seus horários, confirma seus clientes
+            O Agendi organiza seus horários, confirma seus clientes
             automaticamente e mostra quanto você fatura — tudo num lugar só.
           </p>
           <div className="hero-btns">
@@ -367,7 +367,7 @@ export default function LandingPage() {
       <footer className="footer">
         <div className="foot-brand">
           <span className="brand-mark sm">A</span>
-          <span className="brand-name light">Agenda<span>Salão</span></span>
+          <span className="brand-name light">Agend<span>i</span></span>
         </div>
         <p className="foot-by">
           Um produto <a href="https://instagram.com/agenciacsld" target="_blank" rel="noreferrer">Consolidar Tech</a>
@@ -376,7 +376,7 @@ export default function LandingPage() {
           <a href="https://instagram.com/agenciacsld" target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={18} /></a>
           <a href={wppLink} target="_blank" rel="noreferrer" aria-label="WhatsApp"><MessageCircle size={18} /></a>
         </div>
-        <p className="foot-copy">© 2026 Agenda Salão · Todos os direitos reservados</p>
+        <p className="foot-copy">© 2026 Agendi · Todos os direitos reservados</p>
       </footer>
 
       {/* WHATSAPP FLUTUANTE */}
