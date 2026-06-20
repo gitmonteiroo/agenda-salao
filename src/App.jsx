@@ -34,7 +34,10 @@ export default function App() {
       <Route path="/agendar/:slug" element={<AgendarPublico />} />
       <Route
         path="/assinar"
-        element={session ? <Assinar /> : <Navigate to="/login" replace />}
+        element={
+          session === undefined ? null :
+          session ? <Assinar /> : <Navigate to="/login" replace />
+        }
       />
       <Route
         path="/login"
@@ -66,4 +69,4 @@ export default function App() {
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
-                                          }
+        }
