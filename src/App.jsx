@@ -12,9 +12,11 @@ import Servicos from "./pages/Servicos";
 import Financeiro from "./pages/Financeiro";
 import Perfil from "./pages/Perfil";
 import AgendarPublico from "./pages/AgendarPublico";
+import Assinar from "./pages/Assinar";
+import SubscriptionGuard from "./components/SubscriptionGuard";
 
 function useSession() {
-  const [session, setSession] = useState(undefined); // undefined = carregando
+  const [session, setSession] = useState(undefined);
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
@@ -31,6 +33,10 @@ export default function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/agendar/:slug" element={<AgendarPublico />} />
       <Route
+        path="/assinar"
+        element={session ? <Assinar /> : <Navigate to="/login" replace />}
+      />
+      <Route
         path="/login"
         element={session ? <Navigate to="/app/agenda" replace /> : <Login />}
       />
@@ -42,7 +48,11 @@ export default function App() {
         path="/app"
         element={
           session === undefined ? null
-          : session ? <AppLayout />
+          : session ? (
+            <SubscriptionGuard>
+              <AppLayout />
+            </SubscriptionGuard>
+          )
           : <Navigate to="/login" replace />
         }
       >
@@ -56,4 +66,4 @@ export default function App() {
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
-}
+                                          }
