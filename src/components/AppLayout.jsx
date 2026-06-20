@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { CalendarDays, Users, Scissors, Wallet, Settings, LogOut } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import TrialBanner from "./TrialBanner";
 
 const NAV = [
   { to: "/app/agenda", label: "Agenda", icon: CalendarDays },
@@ -58,10 +59,11 @@ export default function AppLayout() {
         <header className="topbar">
           <span className="topbar-neg">{negocio?.nome || "Carregando…"}</span>
         </header>
+        <TrialBanner />
         <div className="content">
           <Outlet />
         </div>
       </main>
     </div>
   );
-}
+          }
