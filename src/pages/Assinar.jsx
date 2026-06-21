@@ -73,7 +73,7 @@ export default function Assinar() {
           {loading ? "Aguarde..." : "💳 Assinar com Mercado Pago"}
         </button>
         <p style={{ fontSize: 12, color: "#9ca3af", marginTop: 16 }}>
-          Pagamento 100% seguro via Mercado Pago. Cancele quando quiser.
+          Pagamento seguro via Mercado Pago • Cartão de crédito • Cancele quando quiser
         </p>
       </div>
     </div>
