@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
 
+const SUPABASE_URL = "https://vaaprybybixusxpfvksg.supabase.co";
+
 export default function Assinar() {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState(null);
@@ -12,7 +14,6 @@ export default function Assinar() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Você precisa estar logado.");
 
-      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
       const response = await fetch(
         `${SUPABASE_URL}/functions/v1/mp-criar-assinatura`,
         {
@@ -25,7 +26,6 @@ export default function Assinar() {
         }
       );
 
-      // Lê como texto primeiro para evitar crash em resposta vazia
       const text = await response.text();
       let data = {};
       try { data = JSON.parse(text); } catch { data = { error: "Resposta invalida: " + text.substring(0, 100) }; }
@@ -78,4 +78,4 @@ export default function Assinar() {
       </div>
     </div>
   );
-      }
+}
